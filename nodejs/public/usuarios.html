@@ -156,6 +156,13 @@
     <script>
         let currentUser = null;
 
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
         async function init() {
             try {
                 const res = await fetch('/api/auth/me');
@@ -190,13 +197,13 @@
                     const isAdmin = currentUser && currentUser.rol === 'admin';
                     const actions = isAdmin ? `
                         <div class="acciones">
-                            <button class="btn btn-primary btn-sm" onclick="editarUsuario('${u.id}','${u.nombre}','${u.email}','${u.rol}','${u.telefono||''}')">Editar</button>
+                            <button class="btn btn-primary btn-sm" onclick="editarUsuario('${u.id}','${escapeHtml(u.nombre).replace(/'/g, "\\'")}','${escapeHtml(u.email).replace(/'/g, "\\'")}','${u.rol}','${escapeHtml(u.telefono||'').replace(/'/g, "\\'")}')">Editar</button>
                             ${u.id !== currentUser.id ? `<button class="btn btn-danger btn-sm" onclick="eliminarUsuario('${u.id}')">Eliminar</button>` : ''}
                         </div>` : '-';
                     return `<tr>
-                        <td><strong>${u.nombre}</strong></td>
-                        <td>${u.email}</td>
-                        <td><span class="badge ${rolClass}">${u.rol}</span></td>
+                        <td><strong>${escapeHtml(u.nombre)}</strong></td>
+                        <td>${escapeHtml(u.email)}</td>
+                        <td><span class="badge ${rolClass}">${escapeHtml(u.rol)}</span></td>
                         <td>${estado}</td>
                         <td>${actions}</td>
                     </tr>`;

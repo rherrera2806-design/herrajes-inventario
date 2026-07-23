@@ -15,7 +15,8 @@ router.get('/', async (req, res) => {
         `);
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -40,7 +41,8 @@ router.get('/criticos', async (req, res) => {
         `);
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -59,7 +61,8 @@ router.get('/resumen', async (req, res) => {
         `);
         res.json(result.rows[0]);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -79,7 +82,8 @@ router.get('/:id', async (req, res) => {
         }
         res.json(result.rows[0]);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -97,7 +101,8 @@ router.post('/', async (req, res) => {
             precio_venta, costo_compra, stock_actual || 0, stock_minimo || 10, stock_maximo || 500, ubicacion]);
         res.status(201).json(result.rows[0]);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -129,7 +134,8 @@ router.put('/:id', async (req, res) => {
         }
         res.json(result.rows[0]);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -143,7 +149,8 @@ router.delete('/:id', async (req, res) => {
         }
         res.json({ message: 'Producto eliminado' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 

@@ -35,7 +35,8 @@ router.post('/login', async (req, res) => {
 
         res.json({ ok: true, user: req.session.user });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 

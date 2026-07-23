@@ -8,7 +8,8 @@ router.get('/', async (req, res) => {
         const result = await db.query('SELECT * FROM clientes WHERE activo = true ORDER BY nombre');
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -19,7 +20,8 @@ router.get('/:id', async (req, res) => {
         if (result.rows.length === 0) return res.status(404).json({ error: 'No encontrado' });
         res.json(result.rows[0]);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -33,7 +35,8 @@ router.post('/', async (req, res) => {
         `, [nombre, rfc, telefono, email, direccion, ciudad]);
         res.status(201).json(result.rows[0]);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -56,7 +59,8 @@ router.put('/:id', async (req, res) => {
         if (result.rows.length === 0) return res.status(404).json({ error: 'No encontrado' });
         res.json(result.rows[0]);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -68,7 +72,8 @@ router.delete('/:id', async (req, res) => {
         if (result.rows.length === 0) return res.status(404).json({ error: 'No encontrado' });
         res.json({ message: 'Cliente eliminado' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 

@@ -190,6 +190,13 @@
     <script>
         let currentUser = null;
 
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
         async function checkAuth() {
             try {
                 const res = await fetch('/api/auth/me');
@@ -229,12 +236,12 @@
 
             tbody.innerHTML = cotizaciones.map(c => `
                 <tr>
-                    <td><strong>${c.numero}</strong></td>
-                    <td>${c.cliente_nombre || '-'}</td>
-                    <td>${c.vendedor_nombre || '-'}</td>
+                    <td><strong>${escapeHtml(c.numero)}</strong></td>
+                    <td>${escapeHtml(c.cliente_nombre || '-')}</td>
+                    <td>${escapeHtml(c.vendedor_nombre || '-')}</td>
                     <td>${new Date(c.fecha_cotizacion).toLocaleDateString('es-MX')}</td>
                     <td class="total">$${parseInt(c.total).toLocaleString()}</td>
-                    <td><span class="badge b-${c.estado}">${c.estado.toUpperCase()}</span></td>
+                    <td><span class="badge b-${escapeHtml(c.estado)}">${escapeHtml(c.estado.toUpperCase())}</span></td>
                     <td>
                         ${c.estado === 'borrador' || c.estado === 'enviada' ?
                             `<a href="/api/cotizaciones/${c.id}/descargar-pdf" class="btn btn-danger btn-sm" download>Descargar PDF</a>` : '-'}
@@ -253,14 +260,14 @@
             const clientes = await res.json();
             const select = document.getElementById('cliente_id');
             select.innerHTML = '<option value="">Seleccionar cliente...</option>' +
-                clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+                clientes.map(c => `<option value="${c.id}">${escapeHtml(c.nombre)}</option>`).join('');
         }
 
         async function cargarUsuarios() {
             const res = await fetch('/api/usuarios');
             const usuarios = await res.json();
             const select = document.getElementById('usuario_id');
-            select.innerHTML = usuarios.map(u => `<option value="${u.user_id}">${u.nombre_completo} (${u.rol})</option>`).join('');
+            select.innerHTML = usuarios.map(u => `<option value="${u.user_id}">${escapeHtml(u.nombre_completo)} (${escapeHtml(u.rol)})</option>`).join('');
         }
 
         function abrirModal() {
@@ -278,7 +285,7 @@
         function agregarDetalle() {
             const container = document.getElementById('detalles-container');
             const id = detalleCount++;
-            const options = productos.map(p => `<option value="${p.id}" data-precio="${p.precio_venta}">${p.codigo} - ${p.nombre} | $${parseInt(p.precio_venta).toLocaleString()} | Stock: ${p.stock_actual}</option>`).join('');
+            const options = productos.map(p => `<option value="${p.id}" data-precio="${p.precio_venta}">${escapeHtml(p.codigo)} - ${escapeHtml(p.nombre)} | $${parseInt(p.precio_venta).toLocaleString()} | Stock: ${p.stock_actual}</option>`).join('');
 
             const html = `
                 <div class="detalle-grid" id="detalle-${id}">

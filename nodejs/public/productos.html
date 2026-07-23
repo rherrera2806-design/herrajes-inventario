@@ -385,6 +385,13 @@
     <script>
         let currentUser = null;
 
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
         async function checkAuth() {
             try {
                 const res = await fetch('/api/auth/me');
@@ -432,21 +439,21 @@
                 totalInventario += valor;
                 return `
                     <tr>
-                        <td><strong>${p.codigo}</strong></td>
-                        <td>${p.nombre}</td>
-                        <td>${p.categoria_nombre || '-'}</td>
+                        <td><strong>${escapeHtml(p.codigo)}</strong></td>
+                        <td>${escapeHtml(p.nombre)}</td>
+                        <td>${escapeHtml(p.categoria_nombre || '-')}</td>
                         <td class="precio">$${parseInt(p.precio_venta).toLocaleString()}</td>
                         <td>
                             <span class="badge ${p.stock_actual <= p.stock_minimo ? 'b-critico' : 'b-ok'}">
-                                ${p.stock_actual} ${p.unidad_medida}
+                                ${p.stock_actual} ${escapeHtml(p.unidad_medida)}
                             </span>
                         </td>
                         <td style="font-weight:700;color:var(--primary);text-align:center;">$${valor.toLocaleString()}</td>
-                        <td>${p.ubicacion || '-'}</td>
+                        <td>${escapeHtml(p.ubicacion || '-')}</td>
                         <td>
                             <div class="acciones">
                                 <button class="btn btn-warning btn-sm" onclick="editarProducto('${p.id}')">✏️ Editar</button>
-                                <button class="btn btn-danger btn-sm" onclick="eliminarProducto('${p.id}', '${p.nombre}')">🗑️ Eliminar</button>
+                                <button class="btn btn-danger btn-sm" onclick="eliminarProducto('${p.id}', '${escapeHtml(p.nombre).replace(/'/g, "\\'")}')">🗑️ Eliminar</button>
                             </div>
                         </td>
                     </tr>
@@ -483,7 +490,7 @@
             if (res.ok) {
                 categorias = await res.json();
                 const select = document.getElementById('categoria_id');
-                select.innerHTML = categorias.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+                select.innerHTML = categorias.map(c => `<option value="${c.id}">${escapeHtml(c.nombre)}</option>`).join('');
             }
         }
 
@@ -492,7 +499,7 @@
             if (res.ok) {
                 proveedores = await res.json();
                 const select = document.getElementById('proveedor_id');
-                select.innerHTML = '<option value="">Sin proveedor</option>' + proveedores.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+                select.innerHTML = '<option value="">Sin proveedor</option>' + proveedores.map(p => `<option value="${p.id}">${escapeHtml(p.nombre)}</option>`).join('');
             }
         }
 

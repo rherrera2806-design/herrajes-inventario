@@ -5,7 +5,25 @@ const XLSX = require('xlsx');
 const db = require('../db/connection');
 
 // Configurar multer para subir archivos
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+    fileFilter: (req, file, cb) => {
+        const allowedMimes = [
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-excel',
+            'application/octet-stream'
+        ];
+        const allowedExts = ['.xlsx', '.xls'];
+        const ext = file.originalname.toLowerCase().substring(file.originalname.lastIndexOf('.'));
+
+        if (allowedMimes.includes(file.mimetype) || allowedExts.includes(ext)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Solo se permiten archivos Excel (.xlsx, .xls)'), false);
+        }
+    }
+});
 
 // POST /api/productos/excel - Carga masiva desde Excel
 router.post('/excel', upload.single('archivo'), async (req, res) => {
@@ -99,7 +117,8 @@ router.post('/excel', upload.single('archivo'), async (req, res) => {
         });
     } catch (error) {
         await client.query('ROLLBACK');
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     } finally {
         client.release();
     }
@@ -191,7 +210,8 @@ router.post('/clientes/excel', upload.single('archivo'), async (req, res) => {
         });
     } catch (error) {
         await client.query('ROLLBACK');
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     } finally {
         client.release();
     }

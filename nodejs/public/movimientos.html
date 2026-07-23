@@ -184,6 +184,13 @@
     <script>
         let currentUser = null;
 
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
         async function checkAuth() {
             try {
                 const res = await fetch('/api/auth/me');
@@ -223,12 +230,12 @@
             tbody.innerHTML = movimientos.map(m => `
                 <tr>
                     <td>${new Date(m.created_at).toLocaleString('es-MX')}</td>
-                    <td><strong>${m.codigo}</strong></td>
-                    <td>${m.producto_nombre}</td>
-                    <td><span class="badge b-${m.tipo_movimiento}">${m.tipo_movimiento.toUpperCase()}</span></td>
-                    <td class="cantidad-${m.tipo_movimiento}">${m.tipo_movimiento === 'entrada' ? '+' : '-'}${m.cantidad}</td>
-                    <td>${m.motivo}</td>
-                    <td>${m.referencia || '-'}</td>
+                    <td><strong>${escapeHtml(m.codigo)}</strong></td>
+                    <td>${escapeHtml(m.producto_nombre)}</td>
+                    <td><span class="badge b-${escapeHtml(m.tipo_movimiento)}">${escapeHtml(m.tipo_movimiento.toUpperCase())}</span></td>
+                    <td class="cantidad-${escapeHtml(m.tipo_movimiento)}">${m.tipo_movimiento === 'entrada' ? '+' : '-'}${m.cantidad}</td>
+                    <td>${escapeHtml(m.motivo)}</td>
+                    <td>${escapeHtml(m.referencia || '-')}</td>
                 </tr>
             `).join('');
         }
@@ -238,7 +245,7 @@
             productos = await res.json();
             const select = document.getElementById('producto_id');
             select.innerHTML = '<option value="">Seleccionar producto...</option>' +
-                productos.map(p => `<option value="${p.id}" data-stock="${p.stock_actual}" data-minimo="${p.stock_minimo}">${p.codigo} - ${p.nombre} (Stock: ${p.stock_actual})</option>`).join('');
+                productos.map(p => `<option value="${p.id}" data-stock="${p.stock_actual}" data-minimo="${p.stock_minimo}">${escapeHtml(p.codigo)} - ${escapeHtml(p.nombre)} (Stock: ${p.stock_actual})</option>`).join('');
         }
 
         function abrirModal(tipo) {

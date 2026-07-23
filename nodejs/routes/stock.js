@@ -41,7 +41,8 @@ router.get('/movimientos', async (req, res) => {
         const result = await db.query(query, params);
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -71,7 +72,8 @@ router.post('/entrada', async (req, res) => {
         res.status(201).json(result.rows[0]);
     } catch (error) {
         await client.query('ROLLBACK');
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     } finally {
         client.release();
     }
@@ -106,7 +108,8 @@ router.post('/salida', async (req, res) => {
         res.status(201).json(result.rows[0]);
     } catch (error) {
         await client.query('ROLLBACK');
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     } finally {
         client.release();
     }
@@ -143,7 +146,8 @@ router.get('/alertas', async (req, res) => {
         `);
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -168,7 +172,8 @@ router.get('/ranking-salidas', async (req, res) => {
         `);
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 

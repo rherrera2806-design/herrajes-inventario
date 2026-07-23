@@ -23,7 +23,8 @@ router.get('/', async (req, res) => {
         const result = await db.query(query, params);
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -58,7 +59,8 @@ router.get('/:id', async (req, res) => {
             detalles: detalles.rows
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -103,7 +105,8 @@ router.post('/', async (req, res) => {
         res.status(201).json(resultado.rows[0]);
     } catch (error) {
         await client.query('ROLLBACK');
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     } finally {
         client.release();
     }
@@ -140,7 +143,8 @@ router.post('/:id/pdf', async (req, res) => {
         res.setHeader('Content-Disposition', `attachment; filename="${cotizacion.rows[0].numero}.pdf"`);
         res.send(pdfBuffer);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -182,7 +186,8 @@ router.post('/:id/enviar', async (req, res) => {
 
         res.json({ message: 'Cotización generada y enviada', email });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -234,7 +239,8 @@ router.post('/:id/aprobar', async (req, res) => {
         res.json({ message: 'Cotización aprobada y stock descontado' });
     } catch (error) {
         await client.query('ROLLBACK');
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     } finally {
         client.release();
     }

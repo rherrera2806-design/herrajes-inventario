@@ -140,6 +140,13 @@
     <script>
         let currentUser = null;
 
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
         async function checkAuth() {
             try {
                 const res = await fetch('/api/auth/me');
@@ -190,15 +197,15 @@
                     const badge = p.estado_stock === 'CRITICO' ? 'b-critico' : 'b-bajo';
                     return `
                         <tr>
-                            <td><strong>${p.codigo}</strong></td>
-                            <td>${p.nombre}</td>
-                            <td>${p.categoria_nombre || '-'}</td>
-                            <td>${p.proveedor_nombre || '-'}</td>
+                            <td><strong>${escapeHtml(p.codigo)}</strong></td>
+                            <td>${escapeHtml(p.nombre)}</td>
+                            <td>${escapeHtml(p.categoria_nombre || '-')}</td>
+                            <td>${escapeHtml(p.proveedor_nombre || '-')}</td>
                             <td>
                                 <div class="progress-bar"><div class="progress-fill ${colorBarra}" style="width:${porcentaje}%"></div></div>
                                 <strong>${p.stock_actual}</strong> / ${p.stock_minimo}
                             </td>
-                            <td><span class="badge ${badge}">${p.estado_stock}</span></td>
+                            <td><span class="badge ${badge}">${escapeHtml(p.estado_stock)}</span></td>
                             <td style="color:#dc2626;font-weight:600;">${p.cantidad_faltante}</td>
                         </tr>
                     `;

@@ -2,12 +2,42 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { engine } = require('express-handlebars');
 const path = require('path');
 const db = require('./db/connection');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Security headers
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            imgSrc: ["'self'", "data:", "https:"],
+            connectSrc: ["'self'"],
+            frameAncestors: ["'none'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"]
+        }
+    },
+    crossOriginEmbedderPolicy: false
+}));
+
+// Rate limiting on login
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 attempts per window
+    message: { error: 'Demasiados intentos. Intenta de nuevo en 15 minutos.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+app.use('/api/auth/login', loginLimiter);
 
 // Session middleware with PostgreSQL store
 app.use(session({
@@ -22,14 +52,14 @@ app.use(session({
     cookie: {
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax'
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
     }
 }));
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Handlebars
@@ -69,7 +99,8 @@ app.get('/api/categorias', requireAuth, async (req, res) => {
         const result = await db.query('SELECT * FROM categorias WHERE activo = true ORDER BY nombre');
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -78,7 +109,8 @@ app.get('/api/proveedores', requireAuth, async (req, res) => {
         const result = await db.query('SELECT * FROM proveedores WHERE activo = true ORDER BY nombre');
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -93,7 +125,8 @@ app.get('/api/usuarios', requireAuth, async (req, res) => {
         `);
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -128,7 +161,8 @@ app.get('/api/cotizaciones/:id/descargar-pdf', requireAuth, async (req, res) => 
         res.setHeader('Content-Disposition', `attachment; filename="${cotizacion.rows[0].numero}.pdf"`);
         res.send(pdfBuffer);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 

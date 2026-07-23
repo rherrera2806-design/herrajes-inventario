@@ -176,6 +176,13 @@
     <script>
         let currentUser = null;
 
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
         async function checkAuth() {
             try {
                 const res = await fetch('/api/auth/me');
@@ -215,7 +222,7 @@
                 document.getElementById('cnt').textContent=c.length;
                 const tb=document.getElementById('tc');
                 if(!c.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--success);font-weight:600;font-size:13px">✅ Stock suficiente</td></tr>';return}
-                tb.innerHTML=c.map(p=>{const cls=p.estado_stock==='CRITICO'?'b-critico':'b-bajo';return`<tr><td><strong>${p.codigo}</strong></td><td>${p.nombre}</td><td>${p.categoria_nombre||'-'}</td><td><strong>${p.stock_actual}</strong></td><td>${p.stock_minimo}</td><td><span class="badge ${cls}">${p.estado_stock}</span></td></tr>`}).join('');
+                tb.innerHTML=c.map(p=>{const cls=p.estado_stock==='CRITICO'?'b-critico':'b-bajo';return`<tr><td><strong>${escapeHtml(p.codigo)}</strong></td><td>${escapeHtml(p.nombre)}</td><td>${escapeHtml(p.categoria_nombre||'-')}</td><td><strong>${p.stock_actual}</strong></td><td>${p.stock_minimo}</td><td><span class="badge ${cls}">${escapeHtml(p.estado_stock)}</span></td></tr>`}).join('');
                 const rk=await(await fetch('/api/stock/ranking-salidas')).json();
                 renderRk(rk);
             }catch(e){console.error(e)}
@@ -225,9 +232,9 @@
             if(!rk||!rk.length){c.innerHTML='<p style="text-align:center;padding:24px;color:var(--text-sec);font-size:12px">📭 Sin salidas</p>';return}
             const m=['🥇','🥈','🥉'],t3=rk.slice(0,3),rest=rk.slice(3,10),mx=parseInt(rk[0].total_salidas)||1;
             let h='<div class="podio">';
-            [[t3[1],'podio-2',1],[t3[0],'podio-1',0],[t3[2],'podio-3',2]].forEach(([it,cls,pos])=>{if(!it)return;h+=`<div class="podio-item ${cls}">${pos===0?'<span class="corona">👑</span>':''}<span class="podio-med">${m[pos]}</span><div class="podio-nom">${it.nombre}</div><div class="podio-cant" data-t="${it.total_salidas}">0</div><div class="podio-lab">salidas</div></div>`});
+            [[t3[1],'podio-2',1],[t3[0],'podio-1',0],[t3[2],'podio-3',2]].forEach(([it,cls,pos])=>{if(!it)return;h+=`<div class="podio-item ${cls}">${pos===0?'<span class="corona">👑</span>':''}<span class="podio-med">${m[pos]}</span><div class="podio-nom">${escapeHtml(it.nombre)}</div><div class="podio-cant" data-t="${it.total_salidas}">0</div><div class="podio-lab">salidas</div></div>`});
             h+='</div>';
-            if(rest.length){h+='<div class="rank-lista">';rest.forEach((p,i)=>{const pct=Math.round(parseInt(p.total_salidas)/mx*100);h+=`<div class="rank-fila"><div class="rank-num">${i+4}</div><div class="rank-info"><div class="rank-nom">${p.nombre}</div><div class="rank-cat">${p.codigo} · ${p.categoria_nombre||''}</div></div><div class="rank-bar-wrap"><div class="rank-bar"><div class="rank-fill" data-pct="${pct}"></div></div></div><div><div class="rank-tot">${parseInt(p.total_salidas).toLocaleString()}</div><div class="rank-uni">salidas</div></div></div>`});h+='</div>'}
+            if(rest.length){h+='<div class="rank-lista">';rest.forEach((p,i)=>{const pct=Math.round(parseInt(p.total_salidas)/mx*100);h+=`<div class="rank-fila"><div class="rank-num">${i+4}</div><div class="rank-info"><div class="rank-nom">${escapeHtml(p.nombre)}</div><div class="rank-cat">${escapeHtml(p.codigo)} · ${escapeHtml(p.categoria_nombre||'')}</div></div><div class="rank-bar-wrap"><div class="rank-bar"><div class="rank-fill" data-pct="${pct}"></div></div></div><div><div class="rank-tot">${parseInt(p.total_salidas).toLocaleString()}</div><div class="rank-uni">salidas</div></div></div>`});h+='</div>'}
             c.innerHTML=h;
             setTimeout(()=>document.querySelectorAll('.rank-fill').forEach(b=>b.style.width=b.dataset.pct+'%'),200);
             document.querySelectorAll('.podio-cant').forEach(el=>{const t=parseInt(el.dataset.t),s=performance.now();(function tk(n){const p=Math.min((n-s)/1200,1);el.textContent=Math.round(t*(1-Math.pow(1-p,3))).toLocaleString();if(p<1)requestAnimationFrame(tk)})(s)});

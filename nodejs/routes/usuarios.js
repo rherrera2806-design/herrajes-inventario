@@ -24,7 +24,8 @@ router.get('/', requireAdmin, async (req, res) => {
         `);
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -57,7 +58,8 @@ router.post('/', requireAdmin, async (req, res) => {
 
         res.status(201).json({ id, nombre, email, rol: userRol });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -88,7 +90,8 @@ router.put('/:id', requireAdmin, async (req, res) => {
 
         res.json({ ok: true });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -109,7 +112,8 @@ router.delete('/:id', requireAdmin, async (req, res) => {
 
         res.json({ ok: true });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
