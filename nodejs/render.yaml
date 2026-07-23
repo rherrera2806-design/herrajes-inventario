@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: herrajes-inventario
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: herrajes-db
+          property: connectionString
+    autoDeploy: true
+
+databases:
+  - name: herrajes-db
+    plan: free
+    databaseName: herrajes_inventario

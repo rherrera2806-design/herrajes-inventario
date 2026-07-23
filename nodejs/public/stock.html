@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Crítico - Herrajes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        html,body{height:100%}
+        body{font-family:'Inter',sans-serif;background:#f9fafb;color:#111827;display:flex}
+        .sidebar{width:240px;height:100vh;background:#111827;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0}
+        .sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+        .sidebar-brand h1{font-size:15px;font-weight:600;color:#f9fafb;display:flex;align-items:center;gap:10px}
+        .sidebar-brand h1 span{font-size:18px}
+        .sidebar-nav{padding:12px 10px;flex:1;display:flex;flex-direction:column;gap:1px}
+        .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:#9ca3af;text-decoration:none;font-size:13px;font-weight:500;border-left:3px solid transparent}
+        .sidebar-nav a.active{background:rgba(99,102,241,.15);color:#fff;border-left-color:#6366f1}
+        .sidebar-nav a .ic{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+        .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:#4b5563}
+        .main{flex:1;display:flex;flex-direction:column;min-width:0}
+        .topbar{background:#fff;padding:16px 28px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:10}
+        .topbar h2{font-size:17px;font-weight:600;color:#111827}
+        .topbar-r{display:flex;align-items:center;gap:14px;font-size:13px;color:#6b7280}
+.topbar-r .user-name{font-weight:500;color:var(--text)}
+.topbar-r .btn-logout{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 12px;font-size:12px;color:var(--text-sec);cursor:pointer}
+.topbar-r .btn-logout:hover{border-color:var(--danger);color:var(--danger)}
+        .tag{background:rgba(99,102,241,.1);color:#6366f1;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+        .content{padding:24px 28px;flex:1}
+        .card{background:#fff;border-radius:10px;padding:22px;border:1px solid #e5e7eb;margin-bottom:18px}
+        .card h2{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:16px}
+        table{width:100%;border-collapse:collapse}
+        th{padding:10px 14px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;border-bottom:1px solid #e5e7eb;white-space:nowrap}
+        td{padding:11px 14px;border-bottom:1px solid #f3f4f6;font-size:13px}
+        tr:last-child td{border-bottom:none}
+        tr:hover td{background:#f9fafb}
+        .btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+        .btn:hover{filter:brightness(1.08)}
+        .btn-primary{background:#6366f1;color:#fff}
+        .btn-success{background:#10b981;color:#fff}
+        .btn-warning{background:#38bdf8;color:#fff}
+        .btn-danger{background:#ef4444;color:#fff}
+        .btn-sm{padding:5px 10px;font-size:12px;border-radius:6px}
+        .btn-group{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+        .badge{padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;display:inline-block}
+        .b-agotado{background:#fef2f2;color:#dc2626}
+        .b-critico{background:#fff7ed;color:#ea580c}
+        .b-bajo{background:#fffbeb;color:#ca8a04}
+        .b-ok{background:#f0fdf4;color:#16a34a}
+        .alert-banner{background:#fff7ed;border-left:4px solid #38bdf8;padding:16px 20px;margin-bottom:22px;border-radius:10px;border:1px solid #e5e7eb}
+        .alert-banner h3{color:#ea580c;margin-bottom:4px;font-size:14px;font-weight:700}
+        .alert-banner p{color:#111827;font-size:13px}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;margin-bottom:22px}
+        .stat-card{background:#fff;border-radius:10px;padding:22px 18px;text-align:center;border:1px solid #e5e7eb}
+        .stat-card h3{font-size:34px;font-weight:700;margin-bottom:4px}
+        .stat-card p{color:#6b7280;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+        .stat-total h3{color:#6366f1}
+        .stat-agotado h3{color:#ef4444}
+        .stat-critico h3{color:#38bdf8}
+        .stat-ok h3{color:#10b981}
+        .progress-bar{width:100px;height:8px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:8px}
+        .progress-fill{height:100%;border-radius:4px}
+        .progress-critico{background:#ef4444}
+        .progress-bajo{background:#38bdf8}
+        .progress-ok{background:#10b981}
+        @media(max-width:768px){
+            .sidebar{width:56px}
+            .sidebar-brand h1 span:last-child,.sidebar-nav a span:last-child,.sidebar-footer{display:none}
+            .sidebar-brand h1{justify-content:center}
+            .sidebar-nav a{justify-content:center;padding:9px 0}
+            .stat-card{padding:16px 12px}
+            .stat-card h3{font-size:26px}
+        }
+        @media(max-width:480px){
+            .stats{grid-template-columns:1fr}
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand"><h1><span>⚙</span><span>Herrajes</span></h1></div>
+        <div class="sidebar-nav">
+            <a href="/"><span class="ic">📊</span><span>Dashboard</span></a>
+            <a href="/productos.html"><span class="ic">📦</span><span>Productos</span></a>
+            <a href="/clientes.html"><span class="ic">👥</span><span>Clientes</span></a>
+            <a href="/cotizaciones.html"><span class="ic">📄</span><span>Cotizaciones</span></a>
+            <a href="/stock.html" class="active"><span class="ic">📉</span><span>Stock Crítico</span></a>
+            <a href="/movimientos.html"><span class="ic">🔄</span><span>Movimientos</span></a>
+        </div>
+        <div class="sidebar-footer">v1.0 · 2026</div>
+    </div>
+    <div class="main">
+        <div class="topbar">
+            <h2>Stock Crítico</h2>
+            <div class="topbar-r">
+                <span class="user-name" id="userName"></span>
+                <span class="tag" id="userRol"></span>
+                <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+            </div>
+        </div>
+        <div class="content">
+            <div class="alert-banner">
+                <h3>⚠️ Alerta de Stock</h3>
+                <p>Se han detectado productos con stock por debajo del mínimo. Revisa la tabla para tomar acciones.</p>
+            </div>
+
+            <div class="stats" id="stats-container">
+                <div class="stat-card"><h3>-</h3><p>Total Productos</p></div>
+                <div class="stat-card"><h3>-</h3><p>Agotados</p></div>
+                <div class="stat-card"><h3>-</h3><p>Críticos</p></div>
+                <div class="stat-card"><h3>-</h3><p>OK</p></div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Productos con Stock Crítico</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Proveedor</th>
+                            <th>Stock</th>
+                            <th>Nivel</th>
+                            <th>Faltante</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-criticos">
+                        <tr><td colspan="7" style="text-align:center;padding:30px;">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="btn-group">
+                <a href="/" class="btn btn-primary">← Volver al Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (!res.ok) { window.location.href = '/login.html'; return; }
+                currentUser = await res.json();
+                document.getElementById('userName').textContent = currentUser.nombre;
+                document.getElementById('userRol').textContent = currentUser.rol;
+
+                if (currentUser.rol === 'admin') {
+                    const nav = document.querySelector('.sidebar-nav');
+                    const link = document.createElement('a');
+                    link.href = '/usuarios.html';
+                    link.innerHTML = '<span class="ic">👤</span><span>Usuarios</span>';
+                    nav.appendChild(link);
+                }
+            } catch (e) { window.location.href = '/login.html'; }
+        }
+
+        async function logout() {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+
+        async function cargarDatos() {
+            await checkAuth();
+            try {
+                const resumenRes = await fetch('/api/productos/resumen');
+                const resumen = await resumenRes.json();
+                document.getElementById('stats-container').innerHTML = `
+                    <div class="stat-card stat-total"><h3>${resumen.total_productos || 0}</h3><p>Total Productos</p></div>
+                    <div class="stat-card stat-agotado"><h3>${resumen.agotados || 0}</h3><p>Agotados</p></div>
+                    <div class="stat-card stat-critico"><h3>${resumen.criticos || 0}</h3><p>Críticos</p></div>
+                    <div class="stat-card stat-ok"><h3>${resumen.ok || 0}</h3><p>OK</p></div>
+                `;
+
+                const criticosRes = await fetch('/api/productos/criticos');
+                const criticos = await criticosRes.json();
+                const tbody = document.getElementById('tabla-criticos');
+
+                if (criticos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#10b981;">Todos los productos tienen stock suficiente</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = criticos.map(p => {
+                    const porcentaje = Math.min((p.stock_actual / p.stock_minimo) * 100, 100);
+                    const colorBarra = porcentaje < 30 ? 'progress-critico' : 'progress-bajo';
+                    const badge = p.estado_stock === 'CRITICO' ? 'b-critico' : 'b-bajo';
+                    return `
+                        <tr>
+                            <td><strong>${p.codigo}</strong></td>
+                            <td>${p.nombre}</td>
+                            <td>${p.categoria_nombre || '-'}</td>
+                            <td>${p.proveedor_nombre || '-'}</td>
+                            <td>
+                                <div class="progress-bar"><div class="progress-fill ${colorBarra}" style="width:${porcentaje}%"></div></div>
+                                <strong>${p.stock_actual}</strong> / ${p.stock_minimo}
+                            </td>
+                            <td><span class="badge ${badge}">${p.estado_stock}</span></td>
+                            <td style="color:#dc2626;font-weight:600;">${p.cantidad_faltante}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        cargarDatos();
+    </script>
+    <script>document.getElementById('fecha').textContent=new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});</script>
+</body>
+</html>

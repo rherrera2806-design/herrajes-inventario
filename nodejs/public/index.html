@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Herrajes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --sidebar-bg:#111827;--sidebar-text:#9ca3af;--sidebar-active:#6366f1;
+            --primary:#6366f1;--primary-hover:#4f46e5;
+            --success:#10b981;--success-hover:#059669;
+            --warning:#f59e0b;--warning-hover:#d97706;
+            --danger:#ef4444;--danger-hover:#dc2626;
+            --text:#111827;--text-sec:#6b7280;
+            --border:#e5e7eb;--bg:#f9fafb;--card:#fff;
+            --radius:10px;--shadow:0 1px 2px rgba(0,0,0,.05)
+        }
+        html,body{height:100%}
+        body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;-webkit-font-smoothing:antialiased}
+
+        .sidebar{width:240px;height:100vh;background:var(--sidebar-bg);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0}
+        .sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+        .sidebar-brand h1{font-size:15px;font-weight:600;color:#f9fafb;display:flex;align-items:center;gap:10px}
+        .sidebar-brand h1 span{font-size:18px}
+        .sidebar-nav{padding:12px 10px;flex:1;display:flex;flex-direction:column;gap:1px}
+        .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--sidebar-text);text-decoration:none;font-size:13px;font-weight:500;border-left:3px solid transparent}
+        .sidebar-nav a.active{background:rgba(99,102,241,.15);color:#fff;border-left-color:var(--sidebar-active)}
+        .sidebar-nav a .ic{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+        .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:#4b5563}
+
+        .main{flex:1;min-width:0;display:flex;flex-direction:column}
+        .topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+        .topbar h2{font-size:16px;font-weight:600}
+        .topbar-r{display:flex;align-items:center;gap:14px;font-size:12px;color:var(--text-sec)}
+        .topbar-r .tag{background:rgba(99,102,241,.1);color:var(--primary);padding:3px 10px;border-radius:16px;font-weight:600;font-size:11px}
+        .topbar-r .user-name{font-weight:500;color:var(--text)}
+        .topbar-r .btn-logout{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 12px;font-size:12px;color:var(--text-sec);cursor:pointer}
+        .topbar-r .btn-logout:hover{border-color:var(--danger);color:var(--danger)}
+        .content{padding:24px 28px;flex:1}
+
+        .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px}
+        .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;text-decoration:none;color:inherit}
+        .stat .label{font-size:11px;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+        .stat .val{font-size:28px;font-weight:700;line-height:1}
+        .stat .sub{font-size:11px;color:var(--text-sec);margin-top:4px}
+        .stat.s-primary .val{color:var(--primary)}
+        .stat.s-danger .val{color:var(--danger)}
+        .stat.s-warning .val{color:var(--warning)}
+        .stat.s-success .val{color:var(--success)}
+        .stat.s-dark .val{color:var(--text);font-weight:800}
+
+        .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+        .card-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+        .card-h h2{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+        .card-h .cnt{background:rgba(99,102,241,.1);color:var(--primary);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+
+        table{width:100%;border-collapse:collapse}
+        th{padding:10px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-sec);border-bottom:1px solid var(--border);white-space:nowrap}
+        td{padding:10px 12px;border-bottom:1px solid #f3f4f6;font-size:13px}
+        tr:last-child td{border-bottom:none}
+        tr:hover td{background:#f9fafb}
+
+        .badge{padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;display:inline-block}
+        .b-agotado{background:#fef2f2;color:#dc2626}
+        .b-critico{background:#fff7ed;color:#ea580c}
+        .b-bajo{background:#fffbeb;color:#ca8a04}
+        .b-ok{background:#f0fdf4;color:#16a34a}
+
+        .btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+        .btn:hover{filter:brightness(1.08)}
+        .btn-primary{background:var(--primary);color:#fff}
+        .btn-success{background:var(--success);color:#fff}
+        .btn-warning{background:#38bdf8;color:#fff}
+        .btn-danger{background:var(--danger);color:#fff}
+        .btn-sm{padding:5px 10px;font-size:12px;border-radius:6px}
+
+        .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+        .acciones{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+        .acc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;text-decoration:none;color:inherit}
+        .acc:hover{border-color:var(--primary);box-shadow:0 2px 8px rgba(99,102,241,.1)}
+        .acc .ic{font-size:28px;margin-bottom:8px;display:block}
+        .acc h3{font-size:14px;font-weight:600;margin-bottom:2px}
+        .acc p{font-size:11px;color:var(--text-sec)}
+
+        .ranking-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+        .podio{display:flex;justify-content:center;align-items:flex-end;gap:10px;margin-bottom:16px;min-height:160px}
+        .podio-item{flex:1;max-width:130px;text-align:center;border-radius:var(--radius);padding:12px 8px 10px;position:relative}
+        .podio-med{font-size:26px;display:block;margin-bottom:4px}
+        .podio-nom{font-size:10px;font-weight:600;margin-bottom:3px;line-height:1.3;min-height:26px;display:flex;align-items:center;justify-content:center}
+        .podio-cant{font-size:20px;font-weight:800}
+        .podio-lab{font-size:9px;color:var(--text-sec);text-transform:uppercase;letter-spacing:.04em}
+        .podio-1{background:linear-gradient(180deg,#fffbeb,#fef3c7);border:1px solid #fde68a}
+        .podio-1 .podio-cant{color:#b45309;font-size:24px}
+        .podio-2{background:linear-gradient(180deg,#f8fafc,#f1f5f9);border:1px solid #e2e8f0}
+        .podio-2 .podio-cant{color:#475569}
+        .podio-3{background:linear-gradient(180deg,#fff7ed,#ffedd5);border:1px solid #fed7aa}
+        .podio-3 .podio-cant{color:#9a3412}
+        .corona{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:20px}
+
+        .rank-lista{display:flex;flex-direction:column;gap:6px}
+        .rank-fila{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:#f9fafb;border:1px solid #f3f4f6}
+        .rank-num{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;background:var(--primary);flex-shrink:0}
+        .rank-info{flex:1;min-width:0}
+        .rank-nom{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .rank-cat{font-size:10px;color:var(--text-sec)}
+        .rank-bar-wrap{flex:1;display:flex;align-items:center;gap:6px;max-width:140px}
+        .rank-bar{flex:1;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+        .rank-fill{height:100%;border-radius:3px;width:0;background:var(--primary);transition:width 1s}
+        .rank-tot{font-size:13px;font-weight:700;color:var(--text);min-width:32px;text-align:right}
+        .rank-uni{font-size:9px;color:var(--text-sec);text-align:right}
+
+        @media(max-width:1024px){.stats{grid-template-columns:repeat(3,1fr)}.grid2,.ranking-grid{grid-template-columns:1fr}.acciones{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:768px){
+            .sidebar{width:56px}.sidebar-brand h1 span:last-child{display:none}.sidebar-nav a span:last-child{display:none}.sidebar-footer{display:none}
+            .content{padding:16px}.topbar{padding:12px 16px}.stats{grid-template-columns:repeat(2,1fr)}.rank-bar-wrap{display:none}
+        }
+        @media(max-width:480px){.sidebar{width:44px}.sidebar-brand{padding:14px 8px}.sidebar-nav{padding:8px 4px}.sidebar-nav a{padding:8px;justify-content:center}.stats{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand"><h1><span>⚙</span><span>Herrajes</span></h1></div>
+        <div class="sidebar-nav">
+            <a href="/" class="active"><span class="ic">📊</span><span>Dashboard</span></a>
+            <a href="/productos.html"><span class="ic">📦</span><span>Productos</span></a>
+            <a href="/clientes.html"><span class="ic">👥</span><span>Clientes</span></a>
+            <a href="/cotizaciones.html"><span class="ic">📄</span><span>Cotizaciones</span></a>
+            <a href="/stock.html"><span class="ic">📉</span><span>Stock Crítico</span></a>
+            <a href="/movimientos.html"><span class="ic">🔄</span><span>Movimientos</span></a>
+        </div>
+        <div class="sidebar-footer">v1.0 · 2026</div>
+    </div>
+    <div class="main">
+        <div class="topbar">
+            <h2>Dashboard</h2>
+            <div class="topbar-r">
+                <span class="user-name" id="userName"></span>
+                <span class="tag" id="userRol"></span>
+                <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+            </div>
+        </div>
+        <div class="content">
+            <div class="stats" id="stats">
+                <div class="stat s-primary"><div class="label">Total</div><div class="val">-</div></div>
+                <div class="stat s-danger"><div class="label">Agotados</div><div class="val">-</div></div>
+                <div class="stat s-warning"><div class="label">Críticos</div><div class="val">-</div></div>
+                <div class="stat s-success"><div class="label">OK</div><div class="val">-</div></div>
+                <div class="stat s-dark"><div class="label">Inventario</div><div class="val">-</div></div>
+            </div>
+            <div class="ranking-grid">
+                <div class="card">
+                    <div class="card-h"><h2>🔴 Stock Crítico</h2><span class="cnt" id="cnt">0</span></div>
+                    <table><thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Stock</th><th>Mín</th><th>Estado</th></tr></thead>
+                    <tbody id="tc"><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-sec);font-size:12px">Cargando...</td></tr></tbody></table>
+                </div>
+                <div class="card">
+                    <div class="card-h"><h2>🏆 Top Salidas</h2></div>
+                    <div id="rk"><p style="text-align:center;padding:24px;color:var(--text-sec);font-size:12px">Cargando...</p></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-h"><h2>⚡ Acceso Rápido</h2></div>
+                <div class="acciones">
+                    <a href="/productos.html" class="acc"><span class="ic">📦</span><h3>Productos</h3><p>Catálogo</p></a>
+                    <a href="/stock.html" class="acc"><span class="ic">📉</span><h3>Stock Crítico</h3><p>Alertas</p></a>
+                    <a href="/cotizaciones.html" class="acc"><span class="ic">📄</span><h3>Cotizaciones</h3><p>Cotizar</p></a>
+                    <a href="/movimientos.html" class="acc"><span class="ic">🔄</span><h3>Movimientos</h3><p>Historial</p></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let currentUser = null;
+
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (!res.ok) { window.location.href = '/login.html'; return; }
+                currentUser = await res.json();
+                document.getElementById('userName').textContent = currentUser.nombre;
+                document.getElementById('userRol').textContent = currentUser.rol;
+
+                // Add Usuarios link for admin
+                if (currentUser.rol === 'admin') {
+                    const nav = document.querySelector('.sidebar-nav');
+                    const link = document.createElement('a');
+                    link.href = '/usuarios.html';
+                    link.innerHTML = '<span class="ic">👤</span><span>Usuarios</span>';
+                    nav.appendChild(link);
+                }
+            } catch (e) { window.location.href = '/login.html'; }
+        }
+
+        async function logout() {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+
+        async function init(){
+            await checkAuth();
+            try{
+                const r=await(await fetch('/api/productos/resumen')).json();
+                const v=parseInt(r.valor_total_inventario||0);
+                document.getElementById('stats').innerHTML=`
+                    <a href="/productos.html" class="stat s-primary"><div class="label">Total</div><div class="val">${r.total_productos||0}</div></a>
+                    <a href="/stock.html" class="stat s-danger"><div class="label">Agotados</div><div class="val">${r.agotados||0}</div></a>
+                    <a href="/stock.html" class="stat s-warning"><div class="label">Críticos</div><div class="val">${r.criticos||0}</div></a>
+                    <a href="/productos.html" class="stat s-success"><div class="label">OK</div><div class="val">${r.ok||0}</div></a>
+                    <a href="/productos.html" class="stat s-dark"><div class="label">Inventario</div><div class="val">$${v.toLocaleString()}</div></a>`;
+                const c=await(await fetch('/api/productos/criticos')).json();
+                document.getElementById('cnt').textContent=c.length;
+                const tb=document.getElementById('tc');
+                if(!c.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--success);font-weight:600;font-size:13px">✅ Stock suficiente</td></tr>';return}
+                tb.innerHTML=c.map(p=>{const cls=p.estado_stock==='CRITICO'?'b-critico':'b-bajo';return`<tr><td><strong>${p.codigo}</strong></td><td>${p.nombre}</td><td>${p.categoria_nombre||'-'}</td><td><strong>${p.stock_actual}</strong></td><td>${p.stock_minimo}</td><td><span class="badge ${cls}">${p.estado_stock}</span></td></tr>`}).join('');
+                const rk=await(await fetch('/api/stock/ranking-salidas')).json();
+                renderRk(rk);
+            }catch(e){console.error(e)}
+        }
+        function renderRk(rk){
+            const c=document.getElementById('rk');
+            if(!rk||!rk.length){c.innerHTML='<p style="text-align:center;padding:24px;color:var(--text-sec);font-size:12px">📭 Sin salidas</p>';return}
+            const m=['🥇','🥈','🥉'],t3=rk.slice(0,3),rest=rk.slice(3,10),mx=parseInt(rk[0].total_salidas)||1;
+            let h='<div class="podio">';
+            [[t3[1],'podio-2',1],[t3[0],'podio-1',0],[t3[2],'podio-3',2]].forEach(([it,cls,pos])=>{if(!it)return;h+=`<div class="podio-item ${cls}">${pos===0?'<span class="corona">👑</span>':''}<span class="podio-med">${m[pos]}</span><div class="podio-nom">${it.nombre}</div><div class="podio-cant" data-t="${it.total_salidas}">0</div><div class="podio-lab">salidas</div></div>`});
+            h+='</div>';
+            if(rest.length){h+='<div class="rank-lista">';rest.forEach((p,i)=>{const pct=Math.round(parseInt(p.total_salidas)/mx*100);h+=`<div class="rank-fila"><div class="rank-num">${i+4}</div><div class="rank-info"><div class="rank-nom">${p.nombre}</div><div class="rank-cat">${p.codigo} · ${p.categoria_nombre||''}</div></div><div class="rank-bar-wrap"><div class="rank-bar"><div class="rank-fill" data-pct="${pct}"></div></div></div><div><div class="rank-tot">${parseInt(p.total_salidas).toLocaleString()}</div><div class="rank-uni">salidas</div></div></div>`});h+='</div>'}
+            c.innerHTML=h;
+            setTimeout(()=>document.querySelectorAll('.rank-fill').forEach(b=>b.style.width=b.dataset.pct+'%'),200);
+            document.querySelectorAll('.podio-cant').forEach(el=>{const t=parseInt(el.dataset.t),s=performance.now();(function tk(n){const p=Math.min((n-s)/1200,1);el.textContent=Math.round(t*(1-Math.pow(1-p,3))).toLocaleString();if(p<1)requestAnimationFrame(tk)})(s)});
+        }
+        init();
+    </script>
+</body>
+</html>

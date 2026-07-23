@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos - Sistema de Herrajes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --warning: #38bdf8;
+            --danger: #ef4444;
+            --text: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f9fafb;
+            --card: #fff;
+            --radius: 10px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            color: var(--text);
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar{width:240px;height:100vh;background:#111827;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0}
+        .sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+        .sidebar-brand h1{font-size:15px;font-weight:600;color:#f9fafb;display:flex;align-items:center;gap:10px}
+        .sidebar-brand h1 span{font-size:18px}
+        .sidebar-nav{padding:12px 10px;flex:1;display:flex;flex-direction:column;gap:1px}
+        .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:#9ca3af;text-decoration:none;font-size:13px;font-weight:500;border-left:3px solid transparent}
+        .sidebar-nav a.active{background:rgba(99,102,241,.15);color:#fff;border-left-color:#6366f1}
+        .sidebar-nav a .ic{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+        .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:#4b5563}
+
+        /* Main */
+        .main { flex: 1; min-width: 0; }
+
+        /* Topbar */
+        .topbar {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .topbar h2 { font-size: 17px; font-weight: 600; color: var(--text); }
+        .topbar-r { display: flex; align-items: center; gap: 14px; font-size: 13px; color: var(--text-secondary); }
+.topbar-r .user-name{font-weight:500;color:var(--text)}
+.topbar-r .btn-logout{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 12px;font-size:12px;color:var(--text-sec);cursor:pointer}
+.topbar-r .btn-logout:hover{border-color:var(--danger);color:var(--danger)}
+        .tag {
+            background: rgba(99,102,241,.1);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Content */
+        .content { padding: 24px 28px; }
+
+        /* Buttons */
+        .btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+        .btn:hover{filter:brightness(1.08)}
+        .btn-primary{background:#6366f1;color:#fff}
+        .btn-success{background:#10b981;color:#fff}
+        .btn-warning{background:#38bdf8;color:#fff}
+        .btn-danger{background:#ef4444;color:#fff}
+        .btn-sm{padding:5px 10px;font-size:12px;border-radius:6px}
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card-header h2 { font-size: 16px; font-weight: 600; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            padding: 12px 14px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f9fafb; }
+
+        /* Badges */
+        .badge{padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;display:inline-block}
+        .b-ok{background:#f0fdf4;color:#16a34a}
+        .b-critico{background:#fff7ed;color:#ea580c}
+
+        /* Search */
+        .search-input {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            width: 260px;
+            outline: none;
+            background: #fff;
+            font-family: 'Inter', sans-serif;
+        }
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+
+        /* Acciones */
+        .acciones { display: flex; gap: 6px; }
+
+        /* Precio */
+        .precio { color: var(--primary); font-weight: 700; text-align: center; }
+        .precio-th { text-align: center; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(15,23,42,.4);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 28px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 { color: var(--text); font-size: 18px; font-weight: 700; }
+        .modal-close {
+            background: none; border: none; font-size: 22px; cursor: pointer;
+            color: var(--text-secondary); width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-close:hover { background: var(--bg); color: var(--text); }
+
+        /* Form */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text); font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 13px; outline: none; background: #fff; font-family: 'Inter', sans-serif;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+
+        /* Excel info */
+        .excel-info {
+            background: rgba(99,102,241,.08);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(99,102,241,.15);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar { width: 56px; }
+            .sidebar-brand h1 span:last-child,
+            .sidebar-nav a span:last-child,
+            .sidebar-footer { display: none; }
+            .sidebar-brand { padding: 16px 12px 12px; }
+            .sidebar-brand h1 { justify-content: center; }
+            .sidebar-nav { padding: 10px 6px; }
+            .sidebar-nav a { justify-content: center; padding: 10px; }
+            .sidebar-nav a .ic { width: auto; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 44px; }
+            .content { padding: 16px; }
+            .card { padding: 16px; }
+            .card-header { flex-direction: column; align-items: flex-start; }
+            .search-input { width: 100%; }
+            th, td { padding: 10px 10px; font-size: 12px; }
+            .form-row { grid-template-columns: 1fr; }
+            .acciones { flex-direction: column; }
+            .topbar { padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand"><h1><span>⚙</span><span>Herrajes</span></h1></div>
+        <div class="sidebar-nav">
+            <a href="/"><span class="ic">📊</span><span>Dashboard</span></a>
+            <a href="/productos.html" class="active"><span class="ic">📦</span><span>Productos</span></a>
+            <a href="/clientes.html"><span class="ic">👥</span><span>Clientes</span></a>
+            <a href="/cotizaciones.html"><span class="ic">📄</span><span>Cotizaciones</span></a>
+            <a href="/stock.html"><span class="ic">📉</span><span>Stock Crítico</span></a>
+            <a href="/movimientos.html"><span class="ic">🔄</span><span>Movimientos</span></a>
+        </div>
+        <div class="sidebar-footer">v1.0 · 2026</div>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <h2>Productos</h2>
+            <div class="topbar-r">
+                <span class="user-name" id="userName"></span>
+                <span class="tag" id="userRol"></span>
+                <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Catálogo de Productos</h2>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                        <input type="text" id="buscador" class="search-input" placeholder="Buscar producto, código, categoría..." oninput="buscarProductos()">
+                        <a href="/api/productos/excel/plantilla" class="btn btn-success btn-sm" download>📥 Plantilla</a>
+                        <button class="btn btn-warning btn-sm" onclick="abrirExcel()">📤 Cargar Excel</button>
+                        <button class="btn btn-primary btn-sm" onclick="abrirModal()">➕ Nuevo Producto</button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th class="precio-th">Precio Venta</th>
+                            <th>Stock</th>
+                            <th class="precio-th">Valor Inventario</th>
+                            <th>Ubicación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-productos">
+                        <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-secondary);">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal Producto -->
+            <div class="modal" id="modalProducto">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modal-title">➕ Nuevo Producto</h3>
+                        <button class="modal-close" onclick="cerrarModal()">&times;</button>
+                    </div>
+                    <form id="formProducto" onsubmit="guardarProducto(event)">
+                        <input type="hidden" id="producto_id">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Código</label>
+                                <input type="text" id="codigo" required placeholder="Ej: BIS-003">
+                            </div>
+                            <div class="form-group">
+                                <label>Unidad</label>
+                                <select id="unidad_medida">
+                                    <option value="pieza">Pieza</option>
+                                    <option value="kg">Kilogramo</option>
+                                    <option value="metro">Metro</option>
+                                    <option value="par">Par</option>
+                                    <option value="juego">Juego</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre del Producto</label>
+                            <input type="text" id="nombre" required placeholder="Nombre del herraje">
+                        </div>
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <textarea id="descripcion" rows="2" placeholder="Descripción del producto"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Categoría</label>
+                                <select id="categoria_id" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Proveedor</label>
+                                <select id="proveedor_id"></select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Precio Venta ($)</label>
+                                <input type="number" id="precio_venta" required placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Costo Compra ($)</label>
+                                <input type="number" id="costo_compra" placeholder="0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Stock Mínimo</label>
+                                <input type="number" id="stock_minimo" value="10" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>Ubicación</label>
+                                <input type="text" id="ubicacion" placeholder="Ej: Estante A-1">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-danger" onclick="cerrarModal()">Cancelar</button>
+                            <button type="submit" class="btn btn-success" id="btn-guardar">Guardar Producto</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal Excel -->
+            <div class="modal" id="modalExcel">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>📤 Carga Masiva desde Excel</h3>
+                        <button class="modal-close" onclick="cerrarExcel()">&times;</button>
+                    </div>
+                    <div class="excel-info">
+                        <strong style="font-size:13px;">📋 Formato del archivo:</strong>
+                        <p style="font-size:13px;margin-top:6px;color:var(--text);">El Excel debe tener estas columnas: CODIGO, NOMBRE, DESCRIPCION, UNIDAD, CATEGORIA, PROVEEDOR, PRECIO_VENTA, COSTO_COMPRA, STOCK, STOCK_MINIMO, UBICACION</p>
+                        <p style="font-size:12px;margin-top:6px;color:var(--primary);">Descarga la plantilla para ver el formato correcto.</p>
+                    </div>
+                    <form id="formExcel" onsubmit="subirExcel(event)">
+                        <div class="form-group">
+                            <label>Seleccionar archivo Excel (.xlsx)</label>
+                            <input type="file" id="archivoExcel" accept=".xlsx,.xls" required style="padding:12px;border:2px dashed var(--border);border-radius:8px;background:var(--bg);">
+                        </div>
+                        <div id="resultado-carga" style="display:none;margin-top:15px;"></div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-danger" onclick="cerrarExcel()">Cancelar</button>
+                            <button type="submit" class="btn btn-success" id="btn-subir">Cargar Productos</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (!res.ok) { window.location.href = '/login.html'; return; }
+                currentUser = await res.json();
+                document.getElementById('userName').textContent = currentUser.nombre;
+                document.getElementById('userRol').textContent = currentUser.rol;
+
+                if (currentUser.rol === 'admin') {
+                    const nav = document.querySelector('.sidebar-nav');
+                    const link = document.createElement('a');
+                    link.href = '/usuarios.html';
+                    link.innerHTML = '<span class="ic">👤</span><span>Usuarios</span>';
+                    nav.appendChild(link);
+                }
+            } catch (e) { window.location.href = '/login.html'; }
+        }
+
+        async function logout() {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+
+        let categorias = [];
+        let proveedores = [];
+        let todosProductos = [];
+
+        async function cargar() {
+            await checkAuth();
+            const res = await fetch('/api/productos');
+            todosProductos = await res.json();
+            renderizarTabla(todosProductos);
+        }
+
+        function renderizarTabla(productos) {
+            const tbody = document.getElementById('tabla-productos');
+            if (productos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-secondary);">No se encontraron productos</td></tr>';
+                return;
+            }
+
+            let totalInventario = 0;
+            tbody.innerHTML = productos.map(p => {
+                const valor = parseInt(p.precio_venta) * parseInt(p.stock_actual);
+                totalInventario += valor;
+                return `
+                    <tr>
+                        <td><strong>${p.codigo}</strong></td>
+                        <td>${p.nombre}</td>
+                        <td>${p.categoria_nombre || '-'}</td>
+                        <td class="precio">$${parseInt(p.precio_venta).toLocaleString()}</td>
+                        <td>
+                            <span class="badge ${p.stock_actual <= p.stock_minimo ? 'b-critico' : 'b-ok'}">
+                                ${p.stock_actual} ${p.unidad_medida}
+                            </span>
+                        </td>
+                        <td style="font-weight:700;color:var(--primary);text-align:center;">$${valor.toLocaleString()}</td>
+                        <td>${p.ubicacion || '-'}</td>
+                        <td>
+                            <div class="acciones">
+                                <button class="btn btn-warning btn-sm" onclick="editarProducto('${p.id}')">✏️ Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="eliminarProducto('${p.id}', '${p.nombre}')">🗑️ Eliminar</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tbody.innerHTML += `
+                <tr style="background:#f9fafb;font-weight:700;">
+                    <td colspan="5" style="text-align:right;">TOTAL INVENTARIO:</td>
+                    <td style="color:var(--primary);font-size:16px;">$${totalInventario.toLocaleString()}</td>
+                    <td colspan="2"></td>
+                </tr>
+            `;
+        }
+
+        function buscarProductos() {
+            const texto = document.getElementById('buscador').value.toLowerCase().trim();
+            if (!texto) {
+                renderizarTabla(todosProductos);
+                return;
+            }
+            const filtrados = todosProductos.filter(p =>
+                (p.codigo && p.codigo.toLowerCase().includes(texto)) ||
+                (p.nombre && p.nombre.toLowerCase().includes(texto)) ||
+                (p.categoria_nombre && p.categoria_nombre.toLowerCase().includes(texto)) ||
+                (p.proveedor_nombre && p.proveedor_nombre.toLowerCase().includes(texto)) ||
+                (p.ubicacion && p.ubicacion.toLowerCase().includes(texto))
+            );
+            renderizarTabla(filtrados);
+        }
+
+        async function cargarCategorias() {
+            const res = await fetch('/api/categorias');
+            if (res.ok) {
+                categorias = await res.json();
+                const select = document.getElementById('categoria_id');
+                select.innerHTML = categorias.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+            }
+        }
+
+        async function cargarProveedores() {
+            const res = await fetch('/api/proveedores');
+            if (res.ok) {
+                proveedores = await res.json();
+                const select = document.getElementById('proveedor_id');
+                select.innerHTML = '<option value="">Sin proveedor</option>' + proveedores.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+            }
+        }
+
+        function abrirModal() {
+            document.getElementById('modal-title').textContent = '➕ Nuevo Producto';
+            document.getElementById('btn-guardar').textContent = 'Guardar Producto';
+            document.getElementById('producto_id').value = '';
+            document.getElementById('formProducto').reset();
+            document.getElementById('modalProducto').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalProducto').classList.remove('active');
+        }
+
+        async function editarProducto(id) {
+            const res = await fetch(`/api/productos/${id}`);
+            const p = await res.json();
+
+            document.getElementById('modal-title').textContent = '✏️ Editar Producto';
+            document.getElementById('btn-guardar').textContent = 'Actualizar Producto';
+            document.getElementById('producto_id').value = p.id;
+            document.getElementById('codigo').value = p.codigo;
+            document.getElementById('nombre').value = p.nombre;
+            document.getElementById('descripcion').value = p.descripcion || '';
+            document.getElementById('unidad_medida').value = p.unidad_medida;
+            document.getElementById('categoria_id').value = p.categoria_id || '';
+            document.getElementById('proveedor_id').value = p.proveedor_id || '';
+            document.getElementById('precio_venta').value = p.precio_venta;
+            document.getElementById('costo_compra').value = p.costo_compra || '';
+            document.getElementById('stock_minimo').value = p.stock_minimo;
+            document.getElementById('ubicacion').value = p.ubicacion || '';
+
+            document.getElementById('modalProducto').classList.add('active');
+        }
+
+        async function eliminarProducto(id, nombre) {
+            if (!confirm(`¿Eliminar el producto "${nombre}"?`)) return;
+
+            try {
+                const res = await fetch(`/api/productos/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    alert('Producto eliminado');
+                    cargar();
+                } else {
+                    const err = await res.json();
+                    alert('Error: ' + err.error);
+                }
+            } catch (e) {
+                alert('Error al eliminar');
+            }
+        }
+
+        async function guardarProducto(e) {
+            e.preventDefault();
+            const id = document.getElementById('producto_id').value;
+            const data = {
+                codigo: document.getElementById('codigo').value,
+                nombre: document.getElementById('nombre').value,
+                descripcion: document.getElementById('descripcion').value,
+                unidad_medida: document.getElementById('unidad_medida').value,
+                categoria_id: document.getElementById('categoria_id').value,
+                proveedor_id: document.getElementById('proveedor_id').value || null,
+                precio_venta: document.getElementById('precio_venta').value,
+                costo_compra: document.getElementById('costo_compra').value || null,
+                stock_minimo: document.getElementById('stock_minimo').value,
+                ubicacion: document.getElementById('ubicacion').value
+            };
+
+            const url = id ? `/api/productos/${id}` : '/api/productos';
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    alert(id ? 'Producto actualizado' : 'Producto creado');
+                    cerrarModal();
+                    cargar();
+                } else {
+                    const err = await res.json();
+                    alert('Error: ' + err.error);
+                }
+            } catch (e) {
+                alert('Error al guardar');
+            }
+        }
+
+        function abrirExcel() {
+            document.getElementById('modalExcel').classList.add('active');
+            document.getElementById('resultado-carga').style.display = 'none';
+            document.getElementById('formExcel').reset();
+        }
+
+        function cerrarExcel() {
+            document.getElementById('modalExcel').classList.remove('active');
+        }
+
+        async function subirExcel(e) {
+            e.preventDefault();
+            const archivo = document.getElementById('archivoExcel').files[0];
+            if (!archivo) return;
+
+            const formData = new FormData();
+            formData.append('archivo', archivo);
+
+            document.getElementById('btn-subir').textContent = 'Cargando...';
+            document.getElementById('btn-subir').disabled = true;
+
+            try {
+                const res = await fetch('/api/productos/excel', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                const div = document.getElementById('resultado-carga');
+                div.style.display = 'block';
+
+                if (res.ok) {
+                    div.innerHTML = `
+                        <div style="background:#f0fdf4;padding:16px;border-radius:8px;border-left:4px solid #10b981;">
+                            <strong style="color:#065f46;">✅ ${data.message}</strong>
+                            ${data.errores ? `<div style="margin-top:10px;font-size:12px;color:#ef4444;">
+                                <strong>⚠️ Errores:</strong><br>${data.errores.join('<br>')}
+                            </div>` : ''}
+                        </div>
+                    `;
+                    cargar();
+                } else {
+                    div.innerHTML = `<div style="background:#fef2f2;padding:16px;border-radius:8px;border-left:4px solid #ef4444;">
+                        <strong style="color:#991b1b;">❌ Error:</strong> ${data.error}
+                    </div>`;
+                }
+            } catch (err) {
+                alert('Error al subir archivo');
+            }
+
+            document.getElementById('btn-subir').textContent = 'Cargar Productos';
+            document.getElementById('btn-subir').disabled = false;
+        }
+
+        cargar();
+        cargarCategorias();
+        cargarProveedores();
+        document.getElementById('fecha').textContent = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<div class="stats">
+    <div class="stat-card">
+        <h3>{{resumen.total}}</h3>
+        <p>Total Productos</p>
+    </div>
+    <div class="stat-card stat-critico">
+        <h3>{{resumen.agotados}}</h3>
+        <p>Agotados</p>
+    </div>
+    <div class="stat-card stat-bajo">
+        <h3>{{resumen.criticos}}</h3>
+        <p>Stock Crítico</p>
+    </div>
+    <div class="stat-card stat-ok">
+        <h3>{{resumen.ok}}</h3>
+        <p>Stock OK</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Productos con Stock Crítico</h2>
+    {{#if stockCritico.length}}
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Stock Actual</th>
+                <th>Stock Mínimo</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each stockCritico}}
+            <tr>
+                <td><strong>{{this.codigo}}</strong></td>
+                <td>{{this.nombre}}</td>
+                <td>{{this.categoria}}</td>
+                <td>{{this.stock_actual}}</td>
+                <td>{{this.stock_minimo}}</td>
+                <td>
+                    {{#if (eq this.estado 'AGOTADO')}}
+                        <span class="badge badge-agotado">AGOTADO</span>
+                    {{else if (eq this.estado 'CRITICO')}}
+                        <span class="badge badge-critico">CRÍTICO</span>
+                    {{else}}
+                        <span class="badge badge-bajo">BAJO</span>
+                    {{/if}}
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    {{else}}
+    <p style="color: #4caf50; text-align: center; padding: 20px;">Todos los productos tienen stock suficiente</p>
+    {{/if}}
+</div>
+
+<div class="card">
+    <h2>Acciones Rápidas</h2>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="/api/productos" class="btn btn-primary">Ver Productos</a>
+        <a href="/api/cotizaciones" class="btn btn-success">Ver Cotizaciones</a>
+        <a href="/api/stock/movimientos" class="btn btn-warning">Ver Movimientos</a>
+        <a href="/api/stock/alertas" class="btn btn-primary">Ver Alertas</a>
+    </div>
+</div>

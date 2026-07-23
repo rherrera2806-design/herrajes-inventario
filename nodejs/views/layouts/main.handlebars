@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Herrajes - Inventario</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
+        .header { background: #1a237e; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 20px; }
+        .header nav a { color: white; text-decoration: none; margin-left: 20px; font-size: 14px; }
+        .header nav a:hover { text-decoration: underline; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card h2 { color: #1a237e; margin-bottom: 15px; font-size: 18px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 32px; margin-bottom: 5px; }
+        .stat-card p { color: #666; font-size: 14px; }
+        .stat-ok h3 { color: #4caf50; }
+        .stat-critico h3 { color: #f44336; }
+        .stat-bajo h3 { color: #ff9800; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f5f5f5; color: #333; font-weight: 600; }
+        tr:hover { background: #f9f9f9; }
+        .badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .badge-agotado { background: #ffebee; color: #c62828; }
+        .badge-critico { background: #fff3e0; color: #e65100; }
+        .badge-bajo { background: #fffde7; color: #f57f17; }
+        .badge-ok { background: #e8f5e9; color: #2e7d32; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #1a237e; color: white; }
+        .btn-primary:hover { background: #283593; }
+        .btn-success { background: #4caf50; color: white; }
+        .btn-warning { background: #ff9800; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Sistema de Herrajes</h1>
+        <nav>
+            <a href="/">Dashboard</a>
+            <a href="/api/productos">Productos</a>
+            <a href="/api/cotizaciones">Cotizaciones</a>
+            <a href="/api/stock/movimientos">Movimientos</a>
+            <a href="/api/stock/alertas">Alertas</a>
+        </nav>
+    </div>
+    <div class="container">
+        {{{body}}}
+    </div>
+</body>
+</html>
