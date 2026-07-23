@@ -4,14 +4,14 @@ const db = require('../db/connection');
 const bcrypt = require('bcryptjs');
 
 // POST /api/auth/login
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({ error: 'Email y contraseña requeridos' });
         }
 
-        const result = db.query('SELECT * FROM users WHERE email = ? AND activo = 1', [email]);
+        const result = await db.query('SELECT * FROM users WHERE email = $1 AND activo = true', [email]);
         if (result.rows.length === 0) {
             return res.status(401).json({ error: 'Credenciales inválidas' });
         }
@@ -23,7 +23,7 @@ router.post('/login', (req, res) => {
         }
 
         // Get perfil
-        const perfil = db.query('SELECT * FROM perfil_usuario WHERE user_id = ?', [user.id]);
+        const perfil = await db.query('SELECT * FROM perfil_usuario WHERE user_id = $1', [user.id]);
 
         req.session.user = {
             id: user.id,

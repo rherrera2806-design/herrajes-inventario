@@ -13,9 +13,9 @@ function requireAdmin(req, res, next) {
 }
 
 // GET /api/usuarios - Listar todos
-router.get('/', requireAdmin, (req, res) => {
+router.get('/', requireAdmin, async (req, res) => {
     try {
-        const result = db.query(`
+        const result = await db.query(`
             SELECT u.id, u.nombre, u.email, u.rol, u.activo, u.created_at,
                    p.telefono
             FROM users u
@@ -29,7 +29,7 @@ router.get('/', requireAdmin, (req, res) => {
 });
 
 // POST /api/usuarios - Crear
-router.post('/', requireAdmin, (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
     try {
         const { nombre, email, password, rol, telefono } = req.body;
         if (!nombre || !email || !password) {
@@ -37,7 +37,7 @@ router.post('/', requireAdmin, (req, res) => {
         }
 
         // Check if email exists
-        const exists = db.query('SELECT id FROM users WHERE email = ?', [email]);
+        const exists = await db.query('SELECT id FROM users WHERE email = $1', [email]);
         if (exists.rows.length > 0) {
             return res.status(400).json({ error: 'El email ya está registrado' });
         }
@@ -47,12 +47,12 @@ router.post('/', requireAdmin, (req, res) => {
         const hash = bcrypt.hashSync(password, salt);
         const userRol = rol || 'consulta';
 
-        db.query('INSERT INTO users (id, nombre, email, password_hash, rol) VALUES (?, ?, ?, ?, ?)',
+        await db.query('INSERT INTO users (id, nombre, email, password_hash, rol) VALUES ($1, $2, $3, $4, $5)',
             [id, nombre, email, hash, userRol]);
 
         // Create perfil
         const perfilId = crypto.randomUUID();
-        db.query('INSERT INTO perfil_usuario (id, user_id, nombre_completo, rol, telefono) VALUES (?, ?, ?, ?, ?)',
+        await db.query('INSERT INTO perfil_usuario (id, user_id, nombre_completo, rol, telefono) VALUES ($1, $2, $3, $4, $5)',
             [perfilId, id, nombre, userRol, telefono || '']);
 
         res.status(201).json({ id, nombre, email, rol: userRol });
@@ -62,12 +62,12 @@ router.post('/', requireAdmin, (req, res) => {
 });
 
 // PUT /api/usuarios/:id - Actualizar
-router.put('/:id', requireAdmin, (req, res) => {
+router.put('/:id', requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const { nombre, email, password, rol, telefono } = req.body;
 
-        const user = db.query('SELECT * FROM users WHERE id = ?', [id]);
+        const user = await db.query('SELECT * FROM users WHERE id = $1', [id]);
         if (user.rows.length === 0) {
             return res.status(404).json({ error: 'Usuario no encontrado' });
         }
@@ -75,15 +75,15 @@ router.put('/:id', requireAdmin, (req, res) => {
         if (password) {
             const salt = bcrypt.genSaltSync(10);
             const hash = bcrypt.hashSync(password, salt);
-            db.query('UPDATE users SET nombre = ?, email = ?, password_hash = ?, rol = ? WHERE id = ?',
+            await db.query('UPDATE users SET nombre = $1, email = $2, password_hash = $3, rol = $4 WHERE id = $5',
                 [nombre || user.rows[0].nombre, email || user.rows[0].email, hash, rol || user.rows[0].rol, id]);
         } else {
-            db.query('UPDATE users SET nombre = ?, email = ?, rol = ? WHERE id = ?',
+            await db.query('UPDATE users SET nombre = $1, email = $2, rol = $3 WHERE id = $4',
                 [nombre || user.rows[0].nombre, email || user.rows[0].email, rol || user.rows[0].rol, id]);
         }
 
         // Update perfil
-        db.query('UPDATE perfil_usuario SET nombre_completo = ?, rol = ?, telefono = ? WHERE user_id = ?',
+        await db.query('UPDATE perfil_usuario SET nombre_completo = $1, rol = $2, telefono = $3 WHERE user_id = $4',
             [nombre || user.rows[0].nombre, rol || user.rows[0].rol, telefono || '', id]);
 
         res.json({ ok: true });
@@ -93,7 +93,7 @@ router.put('/:id', requireAdmin, (req, res) => {
 });
 
 // DELETE /api/usuarios/:id - Desactivar
-router.delete('/:id', requireAdmin, (req, res) => {
+router.delete('/:id', requireAdmin, async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -102,7 +102,7 @@ router.delete('/:id', requireAdmin, (req, res) => {
             return res.status(400).json({ error: 'No puedes eliminarte a ti mismo' });
         }
 
-        const result = db.query('UPDATE users SET activo = 0 WHERE id = ? RETURNING id', [id]);
+        const result = await db.query('UPDATE users SET activo = false WHERE id = $1 RETURNING id', [id]);
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Usuario no encontrado' });
         }

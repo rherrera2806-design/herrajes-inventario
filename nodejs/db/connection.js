@@ -52,13 +52,19 @@ const api = {
     async _initSchema() {
         const client = await pool.connect();
         try {
-            // Check if users table exists
-            const tableCheck = await client.query(
-                "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'users')"
-            );
+            // Check if all critical tables exist
+            const tableCheck = await client.query(`
+                SELECT
+                    EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'users') as has_users,
+                    EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'productos') as has_productos,
+                    EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'clientes') as has_clientes,
+                    EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'cotizaciones') as has_cotizaciones,
+                    EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'movimientos_stock') as has_movimientos
+            `);
 
-            if (tableCheck.rows[0].exists) {
-                console.log('Esquema ya existe, saltando inicialización');
+            const t = tableCheck.rows[0];
+            if (t.has_users && t.has_productos && t.has_clientes && t.has_cotizaciones && t.has_movimientos) {
+                console.log('Esquema completo, saltando inicialización');
                 return;
             }
 
