@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
-const { Pool } = require('pg');
 const { engine } = require('express-handlebars');
 const path = require('path');
 const db = require('./db/connection');
@@ -10,16 +9,10 @@ const db = require('./db/connection');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// PostgreSQL pool for sessions
-const pgPool = new Pool({
-    connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/herrajes_inventario',
-    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
-});
-
 // Session middleware with PostgreSQL store
 app.use(session({
     store: new pgSession({
-        pool: pgPool,
+        pool: db.pool,
         tableName: 'user_sessions',
         createTableIfMissing: true,
     }),
@@ -29,7 +22,7 @@ app.use(session({
     cookie: {
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
         sameSite: 'lax'
     }
 }));
